@@ -1,6 +1,7 @@
 const express = require("express");
 const applicationRoutes = require("../modules/applications/application.routes");
 const authRoutes = require("../modules/auth/auth.routes");
+const complaintRoutes = require("../modules/complaints/complaint.routes");
 const feeRoutes = require("../modules/fees/fee.routes");
 const hostelRoutes = require("../modules/hostels/hostel.routes");
 const leaveRoutes = require("../modules/leaves/leave.routes");
@@ -18,6 +19,7 @@ router.get("/health", (req, res) => {
 });
 
 router.use("/auth", authRoutes);
+router.use("/complaints", complaintRoutes);
 router.use("/fees", feeRoutes);
 router.use("/leaves", leaveRoutes);
 router.use("/visitors", visitorRoutes);
