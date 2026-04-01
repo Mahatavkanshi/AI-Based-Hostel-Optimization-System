@@ -271,6 +271,7 @@ export const resourceLibrary = {
 };
 
 export const workspaceTabs = [
+  { id: 'desk', label: 'Role Desk' },
   { id: 'overview', label: 'Overview' },
   { id: 'explorer', label: 'Data Explorer' },
   { id: 'studio', label: 'Action Studio' },

@@ -1,4 +1,4 @@
-import '../src/styles.css';
+import './globals.css';
 
 export const metadata = {
   title: 'Hostel Management Frontend',

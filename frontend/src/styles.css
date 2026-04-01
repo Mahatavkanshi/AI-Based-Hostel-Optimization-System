@@ -372,6 +372,147 @@ textarea:focus {
   gap: 1.2rem;
 }
 
+.desk-shell {
+  display: grid;
+  gap: 1rem;
+}
+
+.desk-note-strip,
+.feedback-banner,
+.empty-state {
+  border-radius: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line);
+}
+
+.desk-note-strip {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  background: rgba(255, 248, 236, 0.82);
+  color: var(--muted);
+}
+
+.feedback-banner.success {
+  background: rgba(31, 124, 106, 0.12);
+  color: var(--mint);
+}
+
+.feedback-banner.error,
+.empty-state {
+  background: rgba(184, 66, 66, 0.08);
+  color: var(--danger);
+}
+
+.desk-summary-grid,
+.desk-grid,
+.desk-form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.desk-summary-grid {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.desk-grid.two-up,
+.desk-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.desk-stat,
+.desk-card,
+.desk-form {
+  border: 1px solid var(--line);
+  border-radius: 1.2rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.desk-stat,
+.desk-card,
+.desk-form {
+  padding: 1rem;
+}
+
+.desk-stat span {
+  color: var(--muted);
+}
+
+.desk-stat strong {
+  display: block;
+  margin-top: 0.45rem;
+  font-size: 1.85rem;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.desk-card-head {
+  margin-bottom: 0.9rem;
+}
+
+.desk-card-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.desk-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.desk-form-grid label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.table-wrap {
+  overflow: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 620px;
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: 0.8rem 0.7rem;
+  border-bottom: 1px solid rgba(108, 76, 44, 0.1);
+  vertical-align: top;
+}
+
+.data-table th {
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.status-pill {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 0.24rem 0.55rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.status-pill.good {
+  background: rgba(31, 124, 106, 0.12);
+  color: var(--mint);
+}
+
+.status-pill.warn {
+  background: rgba(157, 106, 19, 0.12);
+  color: var(--gold);
+}
+
+.status-pill.bad {
+  background: rgba(184, 66, 66, 0.12);
+  color: var(--danger);
+}
+
 .role-list {
   display: flex;
   flex-wrap: wrap;
@@ -526,7 +667,9 @@ textarea:focus {
   .auth-shell,
   .workspace-shell,
   .split-layout,
-  .editor-grid {
+  .editor-grid,
+  .desk-grid.two-up,
+  .desk-form-grid {
     grid-template-columns: 1fr;
   }
 
@@ -553,7 +696,8 @@ textarea:focus {
   .meta-grid,
   .credential-grid,
   .overview-grid,
-  .resource-grid {
+  .resource-grid,
+  .desk-summary-grid {
     grid-template-columns: 1fr;
   }
 

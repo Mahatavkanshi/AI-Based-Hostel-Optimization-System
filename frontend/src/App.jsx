@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { API_BASE_URL, apiRequest } from './api';
+import RoleDesk from './role-desk';
 import {
   actionLibrary,
   credentialPresets,
@@ -76,6 +77,7 @@ export default function App() {
   const [resourcePayload, setResourcePayload] = useState(null);
 
   const roles = user?.roles || [];
+  const primaryRole = roles[0] || null;
   const actions = useMemo(() => getAvailableItems(roles, actionLibrary), [roles]);
   const resources = useMemo(() => getAvailableItems(roles, resourceLibrary), [roles]);
 
@@ -187,7 +189,7 @@ export default function App() {
       localStorage.setItem('hostel-token', data.data.token);
       localStorage.setItem('hostel-user', JSON.stringify(data.data.user));
       setResponseState({ type: 'success', payload: data });
-      setActiveTab('overview');
+      setActiveTab('desk');
     } catch (error) {
       setLoginError(error.message);
       setResponseState({ type: 'error', payload: prettyError(error) });
@@ -387,6 +389,8 @@ export default function App() {
             </aside>
 
             <section className="main-panel-stack">
+              {activeTab === 'desk' ? <RoleDesk primaryRole={primaryRole} token={token} user={user} /> : null}
+
               {activeTab === 'overview' ? (
                 <>
                   <section className="panel overview-panel">
