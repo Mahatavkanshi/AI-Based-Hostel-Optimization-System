@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const fs = require("fs/promises");
 const prisma = require("../../lib/prisma");
 const ApiError = require("../../utils/api-error");
 const { signAccessToken } = require("../../utils/jwt");
@@ -74,9 +75,14 @@ const signupStudent = async (payload) => {
     throw new ApiError(400, "Live camera capture is required for student signup");
   }
 
-  const user = await userService.createStudent(payload);
-
-  return user;
+  try {
+    const user = await userService.createStudent(payload);
+    return user;
+  } finally {
+    if (payload.liveCapturePhotoFile?.path) {
+      await fs.unlink(payload.liveCapturePhotoFile.path).catch(() => null);
+    }
+  }
 };
 
 module.exports = {

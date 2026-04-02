@@ -240,7 +240,6 @@ model StudentProfile {
   rollNumber         String              @unique
   registrationNumber String?             @unique
   profilePhotoUrl    String?
-  liveCapturePhotoUrl String?
   faceVerified       Boolean             @default(false)
   faceMatchScore     Float?
   faceVerifiedAt     DateTime?
