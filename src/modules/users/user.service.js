@@ -3,6 +3,21 @@ const prisma = require("../../lib/prisma");
 const ApiError = require("../../utils/api-error");
 const sanitizeUser = require("../../utils/sanitize-user");
 
+const buildStoredFileUrl = (file) => {
+  if (!file) {
+    return null;
+  }
+
+  const normalizedPath = file.path.split("\\").join("/");
+  const uploadsIndex = normalizedPath.indexOf("uploads/");
+
+  if (uploadsIndex === -1) {
+    return null;
+  }
+
+  return `/${normalizedPath.slice(uploadsIndex)}`;
+};
+
 const userInclude = {
   roles: {
     include: {
@@ -73,6 +88,11 @@ const createStudent = async (payload) => {
     guardianName,
     guardianPhone,
     address,
+    profilePhotoFile,
+    liveCapturePhotoFile,
+    faceVerified,
+    faceMatchScore,
+    faceVerifiedAt,
   } = payload;
 
   if (!fullName || !email || !password || !rollNumber || !gender || !department || !course || !yearOfStudy) {
@@ -105,6 +125,11 @@ const createStudent = async (payload) => {
           create: {
             rollNumber,
             registrationNumber,
+            profilePhotoUrl: buildStoredFileUrl(profilePhotoFile),
+            liveCapturePhotoUrl: buildStoredFileUrl(liveCapturePhotoFile),
+            faceVerified: faceVerified === true,
+            faceMatchScore: faceMatchScore !== undefined && faceMatchScore !== null ? Number(faceMatchScore) : null,
+            faceVerifiedAt: faceVerifiedAt ? new Date(faceVerifiedAt) : null,
             gender,
             dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
             department,

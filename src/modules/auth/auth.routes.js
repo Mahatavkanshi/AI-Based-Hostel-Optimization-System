@@ -1,5 +1,6 @@
 const express = require("express");
 const auth = require("../../middlewares/auth");
+const upload = require("../../middlewares/student-media-upload");
 const validateBody = require("../../middlewares/validate-body");
 const authController = require("./auth.controller");
 
@@ -8,6 +9,10 @@ const router = express.Router();
 router.post("/login", validateBody(["email", "password"]), authController.login);
 router.post(
   "/signup/student",
+  upload.fields([
+    { name: "profilePhoto", maxCount: 1 },
+    { name: "liveCapturePhoto", maxCount: 1 },
+  ]),
   validateBody(["fullName", "email", "password", "rollNumber", "gender", "department", "course", "yearOfStudy"]),
   authController.signupStudent
 );

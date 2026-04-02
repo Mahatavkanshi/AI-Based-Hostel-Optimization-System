@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiRequest } from './api';
 import { credentialPresets } from './dashboard-config';
@@ -42,6 +42,14 @@ export default function AuthPortal({ roleSlug, mode = 'login' }) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [signup, setSignup] = useState(emptySignup);
+  const [profilePhotoFile, setProfilePhotoFile] = useState(null);
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState('');
+  const [liveCaptureFile, setLiveCaptureFile] = useState(null);
+  const [liveCapturePreview, setLiveCapturePreview] = useState('');
+  const [cameraEnabled, setCameraEnabled] = useState(false);
+
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
 
   const isStudentSignup = role.code === 'STUDENT' && mode === 'signup';
 
@@ -52,6 +60,79 @@ export default function AuthPortal({ roleSlug, mode = 'login' }) {
 
   function updateSignup(field, value) {
     setSignup((current) => ({ ...current, [field]: value }));
+  }
+
+  useEffect(() => {
+    return () => {
+      if (videoRef.current?.srcObject) {
+        const tracks = videoRef.current.srcObject.getTracks();
+        tracks.forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
+  async function startCamera() {
+    setError('');
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user' },
+        audio: false,
+      });
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+
+      setCameraEnabled(true);
+    } catch (cameraError) {
+      setError('Unable to access camera. Please allow camera permissions and try again.');
+    }
+  }
+
+  function stopCamera() {
+    if (videoRef.current?.srcObject) {
+      const tracks = videoRef.current.srcObject.getTracks();
+      tracks.forEach((track) => track.stop());
+      videoRef.current.srcObject = null;
+    }
+
+    setCameraEnabled(false);
+  }
+
+  function handleProfilePhotoChange(event) {
+    const file = event.target.files?.[0] || null;
+    setProfilePhotoFile(file);
+    setProfilePhotoPreview(file ? URL.createObjectURL(file) : '');
+  }
+
+  function captureLivePhoto() {
+    if (!videoRef.current || !canvasRef.current) {
+      return;
+    }
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        setError('Unable to capture live photo. Please try again.');
+        return;
+      }
+
+      const file = new File([blob], `live-capture-${Date.now()}.png`, {
+        type: 'image/png',
+      });
+
+      setLiveCaptureFile(file);
+      setLiveCapturePreview(URL.createObjectURL(blob));
+      stopCamera();
+    }, 'image/png');
   }
 
   async function handleLogin(event) {
@@ -85,10 +166,24 @@ export default function AuthPortal({ roleSlug, mode = 'login' }) {
     setSuccess('');
 
     try {
+      if (!profilePhotoFile) {
+        throw new Error('Profile photo is required.');
+      }
+
+      if (!liveCaptureFile) {
+        throw new Error('Live camera capture is required.');
+      }
+
+      const formData = new FormData();
+      Object.entries(signup).forEach(([key, value]) => {
+        formData.append(key, String(value ?? ''));
+      });
+      formData.append('profilePhoto', profilePhotoFile);
+      formData.append('liveCapturePhoto', liveCaptureFile);
+
       const data = await apiRequest('/auth/signup/student', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(signup),
+        body: formData,
       });
 
       setSuccess(data.message);
@@ -154,6 +249,47 @@ export default function AuthPortal({ roleSlug, mode = 'login' }) {
                 <span>Course</span>
                 <input value={signup.course} onChange={(event) => updateSignup('course', event.target.value)} />
               </label>
+
+              <label>
+                <span>Profile Photo</span>
+                <input type="file" accept="image/*" onChange={handleProfilePhotoChange} />
+              </label>
+
+              <div className="capture-panel full-span-field">
+                <div className="capture-panel-head">
+                  <span>Live Camera Capture</span>
+                  <div className="capture-panel-actions">
+                    {!cameraEnabled ? (
+                      <button type="button" className="secondary-btn" onClick={startCamera}>
+                        Start Camera
+                      </button>
+                    ) : (
+                      <>
+                        <button type="button" className="secondary-btn" onClick={captureLivePhoto}>
+                          Capture Photo
+                        </button>
+                        <button type="button" className="secondary-btn" onClick={stopCamera}>
+                          Stop Camera
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="capture-grid">
+                  <div className="capture-box">
+                    <span>Profile Preview</span>
+                    {profilePhotoPreview ? <img src={profilePhotoPreview} alt="Profile preview" /> : <div className="capture-placeholder">Upload a profile photo</div>}
+                  </div>
+                  <div className="capture-box">
+                    <span>Live Preview</span>
+                    {cameraEnabled ? <video ref={videoRef} autoPlay playsInline muted /> : null}
+                    {!cameraEnabled && liveCapturePreview ? <img src={liveCapturePreview} alt="Live capture preview" /> : null}
+                    {!cameraEnabled && !liveCapturePreview ? <div className="capture-placeholder">Start camera and capture a live image</div> : null}
+                  </div>
+                </div>
+                <canvas ref={canvasRef} hidden />
+              </div>
 
               <button className="primary-btn auth-page-submit" type="submit" disabled={loading}>
                 {loading ? 'Creating Account...' : 'Create Account'}

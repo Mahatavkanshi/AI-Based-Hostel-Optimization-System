@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from 'react';
-import { apiRequest } from './api';
+import { apiRequest, FILE_BASE_URL } from './api';
 
 const deskSources = {
   ADMIN: {
@@ -456,8 +456,31 @@ export default function RoleDesk({ primaryRole, token, user }) {
 
   const renderStudent = () => {
     const hostels = deskData.hostels || [];
+    const studentProfile = user?.studentProfile;
+    const studentPhotoUrl = studentProfile?.profilePhotoUrl ? `${FILE_BASE_URL}${studentProfile.profilePhotoUrl}` : '';
+
     return (
       <>
+        <section className="student-profile-banner">
+          <div className="student-avatar-wrap">
+            {studentPhotoUrl ? (
+              <img className="student-avatar" src={studentPhotoUrl} alt={user.fullName} />
+            ) : (
+              <div className="student-avatar student-avatar-placeholder">{user.fullName?.slice(0, 1) || 'S'}</div>
+            )}
+          </div>
+          <div className="student-profile-copy">
+            <h3>{user.fullName}</h3>
+            <p>{studentProfile?.rollNumber || 'Roll number pending'}</p>
+            <div className="student-badges">
+              <span className={studentProfile?.faceVerified ? 'status-pill good' : 'status-pill warn'}>
+                {studentProfile?.faceVerified ? 'Face Verified' : 'Verification Pending'}
+              </span>
+              {studentProfile?.department ? <span className="student-info-pill">{studentProfile.department}</span> : null}
+            </div>
+          </div>
+        </section>
+
         <section className="desk-summary-grid">
           <SmallStat label="Applications" value={deskData.applications?.length || 0} />
           <SmallStat label="Leaves" value={deskData.leaves?.length || 0} />

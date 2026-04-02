@@ -527,6 +527,69 @@ textarea {
   grid-column: 1 / -1;
 }
 
+.full-span-field {
+  grid-column: 1 / -1;
+}
+
+.capture-panel {
+  display: grid;
+  gap: 0.9rem;
+  border-radius: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 247, 228, 0.12);
+}
+
+.capture-panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  color: #fff9f0;
+}
+
+.capture-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.capture-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.capture-box {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.capture-box span {
+  color: rgba(255, 249, 240, 0.82);
+}
+
+.capture-box img,
+.capture-box video {
+  width: 100%;
+  min-height: 220px;
+  object-fit: cover;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.capture-placeholder {
+  min-height: 220px;
+  border-radius: 1rem;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 1rem;
+  color: rgba(255, 249, 240, 0.7);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px dashed rgba(255, 247, 228, 0.18);
+}
+
 .brand-mark {
   width: 2.75rem;
   height: 2.75rem;
@@ -1652,6 +1715,66 @@ textarea:focus {
   color: var(--muted);
 }
 
+.student-profile-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 1.2rem;
+  background: rgba(255, 249, 239, 0.86);
+  box-shadow: var(--shadow);
+}
+
+.student-avatar-wrap {
+  flex: 0 0 auto;
+}
+
+.student-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 1.1rem;
+  object-fit: cover;
+  display: block;
+  border: 1px solid rgba(108, 76, 44, 0.12);
+}
+
+.student-avatar-placeholder {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, rgba(177, 95, 51, 0.2), rgba(208, 138, 79, 0.32));
+  color: var(--accent-deep);
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.student-profile-copy h3,
+.student-profile-copy p {
+  margin: 0;
+}
+
+.student-profile-copy p {
+  color: var(--muted);
+  margin-top: 0.25rem;
+}
+
+.student-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.7rem;
+}
+
+.student-info-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.28rem 0.65rem;
+  background: rgba(177, 95, 51, 0.1);
+  color: var(--accent-deep);
+  font-size: 0.78rem;
+}
+
 .desk-stat strong {
   display: block;
   margin-top: 0.45rem;
@@ -1887,6 +2010,7 @@ textarea:focus {
   .landing-footer,
   .auth-page-panel,
   .auth-grid-form,
+  .capture-grid,
   .contact-panel,
   .contact-form-ui,
   .poster-topline,
@@ -1934,6 +2058,11 @@ textarea:focus {
 
   .landing-header {
     grid-template-columns: 1fr;
+  }
+
+  .student-profile-banner {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .landing-image-actions {

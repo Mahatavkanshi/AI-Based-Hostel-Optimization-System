@@ -66,6 +66,14 @@ const getCurrentUser = async (userId) => {
 };
 
 const signupStudent = async (payload) => {
+  if (!payload.profilePhotoFile) {
+    throw new ApiError(400, "Profile photo is required for student signup");
+  }
+
+  if (!payload.liveCapturePhotoFile) {
+    throw new ApiError(400, "Live camera capture is required for student signup");
+  }
+
   const user = await userService.createStudent(payload);
 
   return user;

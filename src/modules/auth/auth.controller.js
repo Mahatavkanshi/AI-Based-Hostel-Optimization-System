@@ -21,7 +21,11 @@ const me = asyncHandler(async (req, res) => {
 });
 
 const signupStudent = asyncHandler(async (req, res) => {
-  const user = await authService.signupStudent(req.body);
+  const user = await authService.signupStudent({
+    ...req.body,
+    profilePhotoFile: req.files?.profilePhoto?.[0],
+    liveCapturePhotoFile: req.files?.liveCapturePhoto?.[0],
+  });
 
   res.status(201).json({
     success: true,
