@@ -239,6 +239,38 @@ export default function App() {
 
   const selectedActionMeta = actions.find((item) => item.label === selectedAction);
   const landingRoles = ['Warden', 'Student', 'Gatekeeper', 'Supervisor', 'Accountant', 'Admin'];
+  const landingFeatures = [
+    {
+      icon: 'RB',
+      title: 'Role-Based Access',
+      text: 'Separate entry points for wardens, students, gatekeepers, supervisors, accountants, and admins.',
+    },
+    {
+      icon: 'VP',
+      title: 'Visitor & Gate Flow',
+      text: 'Track visitor approvals and movement records in one secure hostel workflow.',
+    },
+    {
+      icon: 'RA',
+      title: 'Room Allocation',
+      text: 'Manage hostel rooms, bed assignments, and accommodation status with clarity.',
+    },
+    {
+      icon: 'LV',
+      title: 'Leave Approval',
+      text: 'Support real-time leave requests, approvals, and return monitoring for students.',
+    },
+    {
+      icon: 'CP',
+      title: 'Complaint Tracking',
+      text: 'Let issues move through reporting, assignment, and resolution in a structured way.',
+    },
+    {
+      icon: 'FM',
+      title: 'Fee Monitoring',
+      text: 'Keep hostel fee records organized through invoice creation and payment follow-up.',
+    },
+  ];
 
   return (
     <div className="shell">
@@ -273,29 +305,84 @@ export default function App() {
                   <div className="landing-image-overlay" />
                   <div className="landing-image-caption">
                     <span>Single Campus, Multiple Hostels</span>
-                    <strong>Professional housing operations for students, wardens, and campus staff</strong>
+                    <strong>Modern hostel operations for a connected campus.</strong>
                   </div>
                   <div className="landing-image-actions">
                     <button className="primary-btn large-btn" type="button" onClick={() => openRoleAuth('Admin')}>
-                      Enter Dashboard
+                      Choose Role
                     </button>
-                    <div className="landing-mini-grid overlay-mini-grid">
+                    <div className="landing-mini-grid overlay-mini-grid compact-strip">
                       <div>
-                        <strong>6+</strong>
-                        <span>Campus roles</span>
+                        <strong>Image-Led</strong>
                       </div>
                       <div>
-                        <strong>24/7</strong>
-                        <span>Operational flow</span>
+                        <strong>Responsive</strong>
                       </div>
                       <div>
-                        <strong>100%</strong>
-                        <span>Open-source stack</span>
+                        <strong>Role Ready</strong>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+            </section>
+
+            <section className="landing-feature-section">
+              <div className="landing-feature-head">
+                <p className="eyebrow">Key Experiences</p>
+                <h2>Built for practical hostel life with a clean, modern interface.</h2>
+              </div>
+
+              <div className="landing-feature-grid">
+                {landingFeatures.map((feature, index) => (
+                  <article key={feature.title} className="feature-card" style={{ animationDelay: `${index * 90}ms` }}>
+                    <div className="feature-icon">{feature.icon}</div>
+                    <h3>{feature.title}</h3>
+                    <p>{feature.text}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <footer className="landing-footer">
+              <div>
+                <strong>AI-Based Hostel Optimization System</strong>
+                <span>Single campus, multiple hostels, role-based access.</span>
+              </div>
+              <div className="landing-footer-links">
+                <span>Campus Living</span>
+                <span>Secure Access</span>
+                <span>Professional Operations</span>
+              </div>
+            </footer>
+
+            <section className="contact-panel">
+              <div className="contact-copy">
+                <p className="eyebrow">Contact</p>
+                <h2>Get in touch for hostel management coordination.</h2>
+                <p>
+                  This contact section is currently designed as UI only, so you can finalize the look first and
+                  connect the real workflow later.
+                </p>
+              </div>
+
+              <form className="contact-form-ui">
+                <label>
+                  <span>Name</span>
+                  <input type="text" placeholder="Enter your name" />
+                </label>
+                <label>
+                  <span>Email</span>
+                  <input type="email" placeholder="Enter your email" />
+                </label>
+                <label className="full-width-field">
+                  <span>Message</span>
+                  <textarea rows="5" placeholder="Write your message here" />
+                </label>
+                <button className="primary-btn" type="button">
+                  Send Message
+                </button>
+              </form>
             </section>
           </>
         ) : null}
