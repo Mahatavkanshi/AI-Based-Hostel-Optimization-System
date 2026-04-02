@@ -1,17 +1,30 @@
 # AI-Based Hostel Optimization System
 
-Free and open-source hostel management backend for a final-year BTech CSE project.
+Free and open-source hostel management system for a final-year BTech CSE project.
+
+## Repo Layout
+
+```text
+backend/   Node.js + Prisma + PostgreSQL backend
+frontend/  Next.js frontend
+```
+
+Use the two folders independently for deployment.
 
 ## Stack
 
-- Node.js
-- Express.js
-- Prisma ORM
-- PostgreSQL
-- JWT authentication
-- bcrypt password hashing
+- Backend: Node.js, Express.js, Prisma ORM, PostgreSQL, JWT, bcrypt
+- Frontend: Next.js
 
 Everything in this project can run locally using free tools.
+
+## Backend Setup
+
+Run all backend commands from `backend/`.
+
+```bash
+cd backend
+```
 
 ## Current Modules
 
@@ -24,23 +37,6 @@ Everything in this project can run locally using free tools.
 - Visitor management
 - Complaint management
 
-## Project Structure
-
-```text
-prisma/
-  schema.prisma
-  seed.js
-src/
-  app.js
-  server.js
-  config/
-  lib/
-  middlewares/
-  modules/
-  routes/
-  utils/
-```
-
 ## Free Local Setup
 
 ### 1. Install software
@@ -52,12 +48,13 @@ src/
 ### 2. Install dependencies
 
 ```bash
+cd backend
 npm install
 ```
 
 ### 3. Create environment file
 
-Copy `.env.example` to `.env` and update the values.
+Copy `backend/.env.example` to `backend/.env` and update the values.
 
 Example:
 
@@ -78,12 +75,14 @@ Create a PostgreSQL database named `hostel_management_system`.
 ### 5. Run Prisma migration
 
 ```bash
+cd backend
 npx prisma migrate dev --name init
 ```
 
 ### 6. Seed default data
 
 ```bash
+cd backend
 npm run prisma:seed
 ```
 
@@ -99,6 +98,7 @@ This seeds:
 ### 7. Start backend
 
 ```bash
+cd backend
 npm run dev
 ```
 
@@ -106,6 +106,16 @@ Health check:
 
 ```bash
 GET http://localhost:4000/api/health
+```
+
+## Frontend Setup
+
+Run all frontend commands from `frontend/`.
+
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
 ## First Login

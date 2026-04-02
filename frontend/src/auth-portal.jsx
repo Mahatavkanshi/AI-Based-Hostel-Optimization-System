@@ -47,6 +47,9 @@ export default function AuthPortal({ roleSlug, mode = 'login' }) {
   const [liveCaptureFile, setLiveCaptureFile] = useState(null);
   const [liveCapturePreview, setLiveCapturePreview] = useState('');
   const [cameraEnabled, setCameraEnabled] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
+  const [cameraMessage, setCameraMessage] = useState('');
+  const [cameraModalOpen, setCameraModalOpen] = useState(false);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -73,6 +76,8 @@ export default function AuthPortal({ roleSlug, mode = 'login' }) {
 
   async function startCamera() {
     setError('');
+    setCameraMessage('Starting camera...');
+    setCameraModalOpen(true);
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -81,16 +86,29 @@ export default function AuthPortal({ roleSlug, mode = 'login' }) {
       });
 
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+        const video = videoRef.current;
+        video.srcObject = stream;
+
+        await new Promise((resolve) => {
+          video.onloadedmetadata = () => resolve();
+        });
+
+        await video.play();
       }
 
       setCameraEnabled(true);
+      setCameraReady(true);
+      setCameraMessage('Camera ready. Capture your live photo now.');
     } catch (cameraError) {
+      setCameraEnabled(false);
+      setCameraReady(false);
+      setCameraModalOpen(false);
+      setCameraMessage('');
       setError('Unable to access camera. Please allow camera permissions and try again.');
     }
   }
 
-  function stopCamera() {
+  function stopCamera(nextMessage = '', shouldCloseModal = true) {
     if (videoRef.current?.srcObject) {
       const tracks = videoRef.current.srcObject.getTracks();
       tracks.forEach((track) => track.stop());
@@ -98,6 +116,11 @@ export default function AuthPortal({ roleSlug, mode = 'login' }) {
     }
 
     setCameraEnabled(false);
+    setCameraReady(false);
+    setCameraMessage(nextMessage);
+    if (shouldCloseModal) {
+      setCameraModalOpen(false);
+    }
   }
 
   function handleProfilePhotoChange(event) {
@@ -112,6 +135,12 @@ export default function AuthPortal({ roleSlug, mode = 'login' }) {
     }
 
     const video = videoRef.current;
+
+    if (!cameraReady || video.readyState < 2 || !video.videoWidth || !video.videoHeight) {
+      setError('Camera is not ready yet. Please wait for the live preview before capturing.');
+      return;
+    }
+
     const canvas = canvasRef.current;
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -131,8 +160,12 @@ export default function AuthPortal({ roleSlug, mode = 'login' }) {
 
       setLiveCaptureFile(file);
       setLiveCapturePreview(URL.createObjectURL(blob));
-      stopCamera();
+      stopCamera('Live photo captured successfully.');
     }, 'image/png');
+  }
+
+  function closeCameraModal() {
+    stopCamera('', true);
   }
 
   async function handleLogin(event) {
@@ -257,24 +290,15 @@ export default function AuthPortal({ roleSlug, mode = 'login' }) {
 
               <div className="capture-panel full-span-field">
                 <div className="capture-panel-head">
-                  <span>Live Camera Capture</span>
+                  <span>Student Selfie Verification</span>
                   <div className="capture-panel-actions">
-                    {!cameraEnabled ? (
-                      <button type="button" className="secondary-btn" onClick={startCamera}>
-                        Start Camera
-                      </button>
-                    ) : (
-                      <>
-                        <button type="button" className="secondary-btn" onClick={captureLivePhoto}>
-                          Capture Photo
-                        </button>
-                        <button type="button" className="secondary-btn" onClick={stopCamera}>
-                          Stop Camera
-                        </button>
-                      </>
-                    )}
+                    <button type="button" className="secondary-btn" onClick={startCamera}>
+                      {liveCapturePreview ? 'Retake Selfie' : 'Open Camera'}
+                    </button>
                   </div>
                 </div>
+
+                {cameraMessage ? <p className="camera-helper-text">{cameraMessage}</p> : null}
 
                 <div className="capture-grid">
                   <div className="capture-box">
@@ -282,10 +306,8 @@ export default function AuthPortal({ roleSlug, mode = 'login' }) {
                     {profilePhotoPreview ? <img src={profilePhotoPreview} alt="Profile preview" /> : <div className="capture-placeholder">Upload a profile photo</div>}
                   </div>
                   <div className="capture-box">
-                    <span>Live Preview</span>
-                    {cameraEnabled ? <video ref={videoRef} autoPlay playsInline muted /> : null}
-                    {!cameraEnabled && liveCapturePreview ? <img src={liveCapturePreview} alt="Live capture preview" /> : null}
-                    {!cameraEnabled && !liveCapturePreview ? <div className="capture-placeholder">Start camera and capture a live image</div> : null}
+                    <span>Captured Selfie</span>
+                    {liveCapturePreview ? <img src={liveCapturePreview} alt="Live capture preview" /> : <div className="capture-placeholder">Open camera and capture your live selfie</div>}
                   </div>
                 </div>
                 <canvas ref={canvasRef} hidden />
@@ -322,6 +344,47 @@ export default function AuthPortal({ roleSlug, mode = 'login' }) {
           ) : null}
         </div>
       </div>
+
+      {cameraModalOpen ? (
+        <div className="camera-modal-overlay" onClick={closeCameraModal}>
+          <div className="camera-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="camera-modal-head">
+              <div>
+                <p className="eyebrow">Live Selfie Capture</p>
+                <h2>Align your face and capture a clear photo</h2>
+              </div>
+              <button type="button" className="camera-close-btn" onClick={closeCameraModal}>
+                Close
+              </button>
+            </div>
+
+            <div className="camera-modal-stage">
+              <div className="camera-live-frame">
+                <video ref={videoRef} autoPlay playsInline muted />
+                <div className="camera-face-guide" aria-hidden="true" />
+              </div>
+
+              <div className="camera-modal-side">
+                <p className="camera-helper-text">{cameraMessage || 'Allow camera permission and keep your face inside the frame.'}</p>
+                <ul className="camera-tips-list">
+                  <li>Face the camera directly</li>
+                  <li>Use proper lighting</li>
+                  <li>Keep only one face in frame</li>
+                </ul>
+
+                <div className="camera-modal-actions">
+                  <button type="button" className="primary-btn" onClick={captureLivePhoto} disabled={!cameraReady}>
+                    {cameraReady ? 'Capture Photo' : 'Preparing Camera...'}
+                  </button>
+                  <button type="button" className="secondary-btn" onClick={closeCameraModal}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

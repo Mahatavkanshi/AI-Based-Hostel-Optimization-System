@@ -554,6 +554,12 @@ textarea {
   gap: 0.6rem;
 }
 
+.camera-helper-text {
+  margin: 0;
+  color: rgba(255, 249, 240, 0.82);
+  font-size: 0.92rem;
+}
+
 .capture-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -588,6 +594,98 @@ textarea {
   color: rgba(255, 249, 240, 0.7);
   background: rgba(255, 255, 255, 0.06);
   border: 1px dashed rgba(255, 247, 228, 0.18);
+}
+
+.camera-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(8, 12, 14, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+.camera-modal {
+  width: min(960px, 100%);
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 247, 228, 0.14);
+  background: rgba(22, 25, 23, 0.92);
+  color: #fff9f0;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.28);
+  padding: 1.3rem;
+}
+
+.camera-modal-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.camera-modal-head h2 {
+  color: #fff9f0;
+  font-size: 1.5rem;
+}
+
+.camera-close-btn {
+  border: 1px solid rgba(255, 247, 228, 0.16);
+  border-radius: 999px;
+  padding: 0.55rem 0.9rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff9f0;
+  cursor: pointer;
+}
+
+.camera-modal-stage {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.camera-live-frame {
+  position: relative;
+  min-height: 460px;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 247, 228, 0.12);
+}
+
+.camera-live-frame video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.camera-face-guide {
+  position: absolute;
+  inset: 10% 24%;
+  border: 3px solid rgba(255, 248, 232, 0.72);
+  border-radius: 999px;
+  box-shadow: 0 0 0 999px rgba(9, 12, 12, 0.2);
+  pointer-events: none;
+}
+
+.camera-modal-side {
+  display: grid;
+  gap: 1rem;
+}
+
+.camera-tips-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: rgba(255, 249, 240, 0.84);
+  line-height: 1.8;
+}
+
+.camera-modal-actions {
+  display: grid;
+  gap: 0.8rem;
 }
 
 .brand-mark {
@@ -2011,6 +2109,7 @@ textarea:focus {
   .auth-page-panel,
   .auth-grid-form,
   .capture-grid,
+  .camera-modal-stage,
   .contact-panel,
   .contact-form-ui,
   .poster-topline,
