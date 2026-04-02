@@ -20,7 +20,18 @@ const me = asyncHandler(async (req, res) => {
   });
 });
 
+const signupStudent = asyncHandler(async (req, res) => {
+  const user = await authService.signupStudent(req.body);
+
+  res.status(201).json({
+    success: true,
+    message: "Student account created successfully. Please log in.",
+    data: user,
+  });
+});
+
 module.exports = {
   login,
   me,
+  signupStudent,
 };

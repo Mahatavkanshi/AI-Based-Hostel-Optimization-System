@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { API_BASE_URL, apiRequest } from './api';
 import RoleDesk from './role-desk';
 import {
@@ -55,8 +56,7 @@ function ResponsePreview({ responseState }) {
 }
 
 export default function App() {
-  const [email, setEmail] = useState('22040690@coer.ac.in');
-  const [password, setPassword] = useState('Admin@123');
+  const router = useRouter();
   const [token, setToken] = useState(() =>
     typeof window === 'undefined' ? '' : localStorage.getItem('hostel-token') || ''
   );
@@ -172,30 +172,12 @@ export default function App() {
     setRequestBody(formatJson(action.body));
   }
 
-  async function handleLogin(event) {
-    event.preventDefault();
-    setLoading(true);
-    setLoginError('');
+  function getRoleSlug(roleLabel) {
+    return roleLabel.toLowerCase().replace(/\s+/g, '-');
+  }
 
-    try {
-      const data = await apiRequest('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      setToken(data.data.token);
-      setUser(data.data.user);
-      localStorage.setItem('hostel-token', data.data.token);
-      localStorage.setItem('hostel-user', JSON.stringify(data.data.user));
-      setResponseState({ type: 'success', payload: data });
-      setActiveTab('desk');
-    } catch (error) {
-      setLoginError(error.message);
-      setResponseState({ type: 'error', payload: prettyError(error) });
-    } finally {
-      setLoading(false);
-    }
+  function openRoleAuth(roleLabel) {
+    router.push(`/login/${getRoleSlug(roleLabel)}`);
   }
 
   function handleLogout() {
@@ -256,6 +238,7 @@ export default function App() {
   }
 
   const selectedActionMeta = actions.find((item) => item.label === selectedAction);
+  const landingRoles = ['Warden', 'Student', 'Gatekeeper', 'Supervisor', 'Accountant', 'Admin'];
 
   return (
     <div className="shell">
@@ -263,89 +246,61 @@ export default function App() {
       <div className="backdrop backdrop-two" />
 
       <main className="app-frame">
-        <section className="hero-panel hero-shell">
-          <div>
-            <p className="eyebrow">AI-Based Hostel Optimization System</p>
-            <h1>Next.js control room for your full hostel product.</h1>
-            <p className="hero-copy">
-              Test every role, inspect live API data, and customize workflows without using any paid service.
-              This frontend is structured so you can evolve it into your final project UI.
-            </p>
-          </div>
-
-          <div className="meta-grid">
-            <div className="meta-card">
-              <span>Frontend</span>
-              <strong>Next.js App Router</strong>
-            </div>
-            <div className="meta-card">
-              <span>Backend API</span>
-              <strong>{API_BASE_URL}</strong>
-            </div>
-            <div className="meta-card">
-              <span>System health</span>
-              <strong>{healthState.loading ? 'Checking...' : healthState.ok ? 'Online' : 'Offline'}</strong>
-            </div>
-          </div>
-        </section>
-
         {!user ? (
-          <section className="auth-layout auth-shell">
-            <div className="panel glass-panel auth-panel">
-              <div className="panel-heading">
-                <p className="eyebrow">Sign In</p>
-                <h2>Login with any role</h2>
+          <>
+            <section className="landing-header">
+              <div className="landing-brand">
+                <div className="landing-brand-mark">A</div>
+                <div>
+                  <p className="eyebrow">AI-Based Hostel Optimization System</p>
+                  <strong>Professional hostel management platform</strong>
+                </div>
               </div>
 
-              <form className="login-form" onSubmit={handleLogin}>
-                <label>
-                  <span>Email</span>
-                  <input value={email} onChange={(event) => setEmail(event.target.value)} />
-                </label>
-
-                <label>
-                  <span>Password</span>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                  />
-                </label>
-
-                <button className="primary-btn" type="submit" disabled={loading}>
-                  {loading ? 'Signing in...' : 'Open Workspace'}
-                </button>
-
-                {loginError ? <p className="error-text">{loginError}</p> : null}
-              </form>
-            </div>
-
-            <div className="panel credential-panel">
-              <div className="panel-heading">
-                <p className="eyebrow">Quick Access</p>
-                <h2>Ready-made role credentials</h2>
-              </div>
-
-              <div className="credential-grid">
-                {credentialPresets.map((preset) => (
-                  <button
-                    key={preset.role}
-                    className={`credential-card tone-${preset.accent}`}
-                    type="button"
-                    onClick={() => {
-                      setEmail(preset.email);
-                      setPassword(preset.password);
-                    }}
-                  >
-                    <span>{preset.role}</span>
-                    <strong>{preset.email}</strong>
-                    <small>{preset.password}</small>
+              <div className="landing-role-bar">
+                {landingRoles.map((item) => (
+                  <button key={item} className="landing-role-button" type="button" onClick={() => openRoleAuth(item)}>
+                    {item}
                   </button>
                 ))}
               </div>
-            </div>
-          </section>
-        ) : (
+            </section>
+
+            <section className="landing-hero">
+              <div className="landing-image-card full-span-image-card">
+                <div className="landing-image-frame">
+                  <img className="landing-image" src="/image/hostel%20.png" alt="Hostel building" />
+                  <div className="landing-image-overlay" />
+                  <div className="landing-image-caption">
+                    <span>Single Campus, Multiple Hostels</span>
+                    <strong>Professional housing operations for students, wardens, and campus staff</strong>
+                  </div>
+                  <div className="landing-image-actions">
+                    <button className="primary-btn large-btn" type="button" onClick={() => openRoleAuth('Admin')}>
+                      Enter Dashboard
+                    </button>
+                    <div className="landing-mini-grid overlay-mini-grid">
+                      <div>
+                        <strong>6+</strong>
+                        <span>Campus roles</span>
+                      </div>
+                      <div>
+                        <strong>24/7</strong>
+                        <span>Operational flow</span>
+                      </div>
+                      <div>
+                        <strong>100%</strong>
+                        <span>Open-source stack</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </>
+        ) : null}
+
+        {user ? (
           <section className="workspace-shell">
             <aside className="panel sidebar-panel">
               <div className="panel-heading">
@@ -381,6 +336,12 @@ export default function App() {
                 <span>Backend status</span>
                 <strong>{healthState.ok ? 'Connected' : 'Not connected'}</strong>
                 <small>{healthState.message}</small>
+              </div>
+
+              <div className="status-card muted-card">
+                <span>Primary role</span>
+                <strong>{primaryRole}</strong>
+                <small>Switch tabs to explore data, use forms, and call APIs.</small>
               </div>
 
               <button className="secondary-btn" type="button" onClick={handleLogout}>
@@ -577,9 +538,8 @@ export default function App() {
                         type="button"
                         className={`credential-card tone-${preset.accent}`}
                         onClick={() => {
-                          setEmail(preset.email);
-                          setPassword(preset.password);
                           handleLogout();
+                          router.push(`/login/${preset.role.toLowerCase().replace(/_/g, '-').replace('student', 'student')}`);
                         }}
                       >
                         <span>{preset.role}</span>
@@ -592,7 +552,7 @@ export default function App() {
               ) : null}
             </section>
           </section>
-        )}
+        ) : null}
       </main>
     </div>
   );

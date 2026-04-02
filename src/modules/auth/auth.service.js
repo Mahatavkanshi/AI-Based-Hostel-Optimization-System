@@ -3,6 +3,7 @@ const prisma = require("../../lib/prisma");
 const ApiError = require("../../utils/api-error");
 const { signAccessToken } = require("../../utils/jwt");
 const sanitizeUser = require("../../utils/sanitize-user");
+const userService = require("../users/user.service");
 
 const login = async ({ email, password }) => {
   if (!email || !password) {
@@ -64,7 +65,14 @@ const getCurrentUser = async (userId) => {
   return sanitizeUser(user);
 };
 
+const signupStudent = async (payload) => {
+  const user = await userService.createStudent(payload);
+
+  return user;
+};
+
 module.exports = {
   login,
   getCurrentUser,
+  signupStudent,
 };

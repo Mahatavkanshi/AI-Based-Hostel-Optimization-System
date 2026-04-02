@@ -530,6 +530,27 @@ export default function RoleDesk({ primaryRole, token, user }) {
         <small>Use these forms to test real workflows without editing raw JSON.</small>
       </div>
 
+      <div className="desk-hero-card">
+        <div>
+          <p className="eyebrow">Operational Focus</p>
+          <h3>{primaryRole} control panel</h3>
+          <p>
+            This desk shows live tables plus guided forms so you can demo each workflow clearly during viva
+            and then customize the fields later.
+          </p>
+        </div>
+        <div className="desk-hero-metrics">
+          <div>
+            <span>Role</span>
+            <strong>{primaryRole}</strong>
+          </div>
+          <div>
+            <span>Mode</span>
+            <strong>Live API</strong>
+          </div>
+        </div>
+      </div>
+
       {feedback ? <div className="feedback-banner success">{feedback}</div> : null}
       {error ? <div className="feedback-banner error">{error}</div> : null}
 
