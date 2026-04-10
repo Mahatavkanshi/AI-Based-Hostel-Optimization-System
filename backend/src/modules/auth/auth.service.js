@@ -75,6 +75,14 @@ const signupStudent = async (payload) => {
     throw new ApiError(400, "Live camera capture is required for student signup");
   }
 
+  if (String(payload.faceVerified) !== "true") {
+    throw new ApiError(400, "Face verification is required before student signup");
+  }
+
+  if (!payload.faceMatchScore) {
+    throw new ApiError(400, "Face match score is required before student signup");
+  }
+
   try {
     const user = await userService.createStudent(payload);
     return user;

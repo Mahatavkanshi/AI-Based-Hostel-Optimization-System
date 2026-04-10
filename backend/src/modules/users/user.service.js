@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const { Prisma } = require("@prisma/client");
 const prisma = require("../../lib/prisma");
 const ApiError = require("../../utils/api-error");
 const sanitizeUser = require("../../utils/sanitize-user");
@@ -26,6 +27,26 @@ const userInclude = {
   },
   studentProfile: true,
   staffProfile: true,
+};
+
+const duplicateFieldMessages = {
+  email: "This email is already registered.",
+  phone: "This phone number is already registered.",
+  rollNumber: "This roll number is already registered.",
+  registrationNumber: "This registration number is already registered.",
+  employeeId: "This employee ID is already registered.",
+};
+
+const handlePrismaWriteError = (error) => {
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  ) {
+    const target = Array.isArray(error.meta?.target) ? error.meta.target[0] : null;
+    throw new ApiError(409, duplicateFieldMessages[target] || "A record with this value already exists.");
+  }
+
+  throw error;
 };
 
 const getRolesByCodes = async (roleCodes) => {
@@ -108,43 +129,49 @@ const createStudent = async (payload) => {
 
   const passwordHash = await bcrypt.hash(password, 10);
 
-  const user = await prisma.$transaction(async (tx) => {
-    const createdUser = await tx.user.create({
-      data: {
-        fullName,
-        email,
-        phone,
-        passwordHash,
-        roles: {
-          create: {
-            roleId: role.id,
-          },
-        },
-        studentProfile: {
-          create: {
-            rollNumber,
-            registrationNumber,
-            profilePhotoUrl: buildStoredFileUrl(profilePhotoFile),
-            faceVerified: faceVerified === true,
-            faceMatchScore: faceMatchScore !== undefined && faceMatchScore !== null ? Number(faceMatchScore) : null,
-            faceVerifiedAt: faceVerifiedAt ? new Date(faceVerifiedAt) : null,
-            gender,
-            dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
-            department,
-            course,
-            yearOfStudy: Number(yearOfStudy),
-            semester: semester ? Number(semester) : null,
-            guardianName,
-            guardianPhone,
-            address,
-          },
-        },
-      },
-      include: userInclude,
-    });
+  let user;
 
-    return createdUser;
-  });
+  try {
+    user = await prisma.$transaction(async (tx) => {
+      const createdUser = await tx.user.create({
+        data: {
+          fullName,
+          email,
+          phone,
+          passwordHash,
+          roles: {
+            create: {
+              roleId: role.id,
+            },
+          },
+          studentProfile: {
+            create: {
+              rollNumber,
+              registrationNumber,
+              profilePhotoUrl: buildStoredFileUrl(profilePhotoFile),
+              faceVerified: faceVerified === true || faceVerified === "true",
+              faceMatchScore: faceMatchScore !== undefined && faceMatchScore !== null ? Number(faceMatchScore) : null,
+              faceVerifiedAt: faceVerifiedAt ? new Date(faceVerifiedAt) : null,
+              gender,
+              dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+              department,
+              course,
+              yearOfStudy: Number(yearOfStudy),
+              semester: semester ? Number(semester) : null,
+              guardianName,
+              guardianPhone,
+              address,
+            },
+          },
+        },
+        include: userInclude,
+      });
+
+      return createdUser;
+    });
+  } catch (error) {
+    handlePrismaWriteError(error);
+  }
 
   return sanitizeUser(user);
 };
@@ -178,33 +205,39 @@ const createStaff = async (payload) => {
 
   const passwordHash = await bcrypt.hash(password, 10);
 
-  const user = await prisma.$transaction(async (tx) => {
-    const createdUser = await tx.user.create({
-      data: {
-        fullName,
-        email,
-        phone,
-        passwordHash,
-        roles: {
-          create: roles.map((role) => ({
-            roleId: role.id,
-          })),
-        },
-        staffProfile: {
-          create: {
-            employeeId,
-            gender,
-            designation,
-            joiningDate: joiningDate ? new Date(joiningDate) : null,
-            assignedHostelId: assignedHostelId || null,
+  let user;
+
+  try {
+    user = await prisma.$transaction(async (tx) => {
+      const createdUser = await tx.user.create({
+        data: {
+          fullName,
+          email,
+          phone,
+          passwordHash,
+          roles: {
+            create: roles.map((role) => ({
+              roleId: role.id,
+            })),
+          },
+          staffProfile: {
+            create: {
+              employeeId,
+              gender,
+              designation,
+              joiningDate: joiningDate ? new Date(joiningDate) : null,
+              assignedHostelId: assignedHostelId || null,
+            },
           },
         },
-      },
-      include: userInclude,
-    });
+        include: userInclude,
+      });
 
-    return createdUser;
-  });
+      return createdUser;
+    });
+  } catch (error) {
+    handlePrismaWriteError(error);
+  }
 
   return sanitizeUser(user);
 };
